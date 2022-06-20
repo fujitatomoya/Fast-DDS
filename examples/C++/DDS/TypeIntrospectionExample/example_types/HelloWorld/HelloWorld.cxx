@@ -35,7 +35,7 @@ using namespace eprosima::fastcdr::exception;
 
 #include <utility>
 
-HelloWorld::HelloWorld()
+HelloWorld_TypeIntrospectionExample::HelloWorld_TypeIntrospectionExample()
 {
     // m_index com.eprosima.idl.parser.typecode.PrimitiveTypeCode@22eeefeb
     m_index = 0;
@@ -46,28 +46,28 @@ HelloWorld::HelloWorld()
     registerHelloWorldTypes();
 }
 
-HelloWorld::~HelloWorld()
+HelloWorld_TypeIntrospectionExample::~HelloWorld_TypeIntrospectionExample()
 {
 
 
 }
 
-HelloWorld::HelloWorld(
-        const HelloWorld& x)
+HelloWorld_TypeIntrospectionExample::HelloWorld_TypeIntrospectionExample(
+        const HelloWorld_TypeIntrospectionExample& x)
 {
     m_index = x.m_index;
     m_message = x.m_message;
 }
 
-HelloWorld::HelloWorld(
-        HelloWorld&& x)
+HelloWorld_TypeIntrospectionExample::HelloWorld_TypeIntrospectionExample(
+        HelloWorld_TypeIntrospectionExample&& x)
 {
     m_index = x.m_index;
     m_message = std::move(x.m_message);
 }
 
-HelloWorld& HelloWorld::operator =(
-        const HelloWorld& x)
+HelloWorld_TypeIntrospectionExample& HelloWorld_TypeIntrospectionExample::operator =(
+        const HelloWorld_TypeIntrospectionExample& x)
 {
 
     m_index = x.m_index;
@@ -76,8 +76,8 @@ HelloWorld& HelloWorld::operator =(
     return *this;
 }
 
-HelloWorld& HelloWorld::operator =(
-        HelloWorld&& x)
+HelloWorld_TypeIntrospectionExample& HelloWorld_TypeIntrospectionExample::operator =(
+        HelloWorld_TypeIntrospectionExample&& x)
 {
 
     m_index = x.m_index;
@@ -86,20 +86,20 @@ HelloWorld& HelloWorld::operator =(
     return *this;
 }
 
-bool HelloWorld::operator ==(
-        const HelloWorld& x) const
+bool HelloWorld_TypeIntrospectionExample::operator ==(
+        const HelloWorld_TypeIntrospectionExample& x) const
 {
 
     return (m_index == x.m_index && m_message == x.m_message);
 }
 
-bool HelloWorld::operator !=(
-        const HelloWorld& x) const
+bool HelloWorld_TypeIntrospectionExample::operator !=(
+        const HelloWorld_TypeIntrospectionExample& x) const
 {
     return !(*this == x);
 }
 
-size_t HelloWorld::getMaxCdrSerializedSize(
+size_t HelloWorld_TypeIntrospectionExample::getMaxCdrSerializedSize(
         size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
@@ -115,8 +115,8 @@ size_t HelloWorld::getMaxCdrSerializedSize(
     return current_alignment - initial_alignment;
 }
 
-size_t HelloWorld::getCdrSerializedSize(
-        const HelloWorld& data,
+size_t HelloWorld_TypeIntrospectionExample::getCdrSerializedSize(
+        const HelloWorld_TypeIntrospectionExample& data,
         size_t current_alignment)
 {
     (void)data;
@@ -135,7 +135,7 @@ size_t HelloWorld::getCdrSerializedSize(
     return current_alignment - initial_alignment;
 }
 
-void HelloWorld::serialize(
+void HelloWorld_TypeIntrospectionExample::serialize(
         eprosima::fastcdr::Cdr& scdr) const
 {
 
@@ -145,7 +145,7 @@ void HelloWorld::serialize(
 
 }
 
-void HelloWorld::deserialize(
+void HelloWorld_TypeIntrospectionExample::deserialize(
         eprosima::fastcdr::Cdr& dcdr)
 {
 
@@ -158,7 +158,7 @@ void HelloWorld::deserialize(
  * @brief This function sets a value in member index
  * @param _index New value for member index
  */
-void HelloWorld::index(
+void HelloWorld_TypeIntrospectionExample::index(
         uint32_t _index)
 {
     m_index = _index;
@@ -168,7 +168,7 @@ void HelloWorld::index(
  * @brief This function returns the value of member index
  * @return Value of member index
  */
-uint32_t HelloWorld::index() const
+uint32_t HelloWorld_TypeIntrospectionExample::index() const
 {
     return m_index;
 }
@@ -177,7 +177,7 @@ uint32_t HelloWorld::index() const
  * @brief This function returns a reference to member index
  * @return Reference to member index
  */
-uint32_t& HelloWorld::index()
+uint32_t& HelloWorld_TypeIntrospectionExample::index()
 {
     return m_index;
 }
@@ -186,7 +186,7 @@ uint32_t& HelloWorld::index()
  * @brief This function copies the value in member message
  * @param _message New value to be copied in member message
  */
-void HelloWorld::message(
+void HelloWorld_TypeIntrospectionExample::message(
         const std::array<char, 20>& _message)
 {
     m_message = _message;
@@ -196,7 +196,7 @@ void HelloWorld::message(
  * @brief This function moves the value in member message
  * @param _message New value to be moved in member message
  */
-void HelloWorld::message(
+void HelloWorld_TypeIntrospectionExample::message(
         std::array<char, 20>&& _message)
 {
     m_message = std::move(_message);
@@ -206,7 +206,7 @@ void HelloWorld::message(
  * @brief This function returns a constant reference to member message
  * @return Constant reference to member message
  */
-const std::array<char, 20>& HelloWorld::message() const
+const std::array<char, 20>& HelloWorld_TypeIntrospectionExample::message() const
 {
     return m_message;
 }
@@ -215,12 +215,12 @@ const std::array<char, 20>& HelloWorld::message() const
  * @brief This function returns a reference to member message
  * @return Reference to member message
  */
-std::array<char, 20>& HelloWorld::message()
+std::array<char, 20>& HelloWorld_TypeIntrospectionExample::message()
 {
     return m_message;
 }
 
-size_t HelloWorld::getKeyMaxCdrSerializedSize(
+size_t HelloWorld_TypeIntrospectionExample::getKeyMaxCdrSerializedSize(
         size_t current_alignment)
 {
     size_t current_align = current_alignment;
@@ -232,12 +232,12 @@ size_t HelloWorld::getKeyMaxCdrSerializedSize(
     return current_align;
 }
 
-bool HelloWorld::isKeyDefined()
+bool HelloWorld_TypeIntrospectionExample::isKeyDefined()
 {
     return false;
 }
 
-void HelloWorld::serializeKey(
+void HelloWorld_TypeIntrospectionExample::serializeKey(
         eprosima::fastcdr::Cdr& scdr) const
 {
     (void) scdr;

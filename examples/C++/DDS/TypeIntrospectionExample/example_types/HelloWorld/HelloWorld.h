@@ -62,64 +62,64 @@ class Cdr;
 
 
 /*!
- * @brief This class represents the structure HelloWorld defined by the user in the IDL file.
+ * @brief This class represents the structure HelloWorld_TypeIntrospectionExample defined by the user in the IDL file.
  * @ingroup HELLOWORLD
  */
-class HelloWorld
+class HelloWorld_TypeIntrospectionExample
 {
 public:
 
     /*!
      * @brief Default constructor.
      */
-    eProsima_user_DllExport HelloWorld();
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExample();
 
     /*!
      * @brief Default destructor.
      */
-    eProsima_user_DllExport ~HelloWorld();
+    eProsima_user_DllExport ~HelloWorld_TypeIntrospectionExample();
 
     /*!
      * @brief Copy constructor.
-     * @param x Reference to the object HelloWorld that will be copied.
+     * @param x Reference to the object HelloWorld_TypeIntrospectionExample that will be copied.
      */
-    eProsima_user_DllExport HelloWorld(
-            const HelloWorld& x);
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExample(
+            const HelloWorld_TypeIntrospectionExample& x);
 
     /*!
      * @brief Move constructor.
-     * @param x Reference to the object HelloWorld that will be copied.
+     * @param x Reference to the object HelloWorld_TypeIntrospectionExample that will be copied.
      */
-    eProsima_user_DllExport HelloWorld(
-            HelloWorld&& x);
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExample(
+            HelloWorld_TypeIntrospectionExample&& x);
 
     /*!
      * @brief Copy assignment.
-     * @param x Reference to the object HelloWorld that will be copied.
+     * @param x Reference to the object HelloWorld_TypeIntrospectionExample that will be copied.
      */
-    eProsima_user_DllExport HelloWorld& operator =(
-            const HelloWorld& x);
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExample& operator =(
+            const HelloWorld_TypeIntrospectionExample& x);
 
     /*!
      * @brief Move assignment.
-     * @param x Reference to the object HelloWorld that will be copied.
+     * @param x Reference to the object HelloWorld_TypeIntrospectionExample that will be copied.
      */
-    eProsima_user_DllExport HelloWorld& operator =(
-            HelloWorld&& x);
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExample& operator =(
+            HelloWorld_TypeIntrospectionExample&& x);
 
     /*!
      * @brief Comparison operator.
-     * @param x HelloWorld object to compare.
+     * @param x HelloWorld_TypeIntrospectionExample object to compare.
      */
     eProsima_user_DllExport bool operator ==(
-            const HelloWorld& x) const;
+            const HelloWorld_TypeIntrospectionExample& x) const;
 
     /*!
      * @brief Comparison operator.
-     * @param x HelloWorld object to compare.
+     * @param x HelloWorld_TypeIntrospectionExample object to compare.
      */
     eProsima_user_DllExport bool operator !=(
-            const HelloWorld& x) const;
+            const HelloWorld_TypeIntrospectionExample& x) const;
 
     /*!
      * @brief This function sets a value in member index
@@ -182,7 +182,7 @@ public:
      * @return Serialized size.
      */
     eProsima_user_DllExport static size_t getCdrSerializedSize(
-            const HelloWorld& data,
+            const HelloWorld_TypeIntrospectionExample& data,
             size_t current_alignment = 0);
 
 

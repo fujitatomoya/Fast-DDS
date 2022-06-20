@@ -244,7 +244,7 @@ void TypeIntrospectionPublisher::publish(unsigned int msg_index)
 void TypeIntrospectionPublisher::register_helloworld_()
 {
     // Create new PubSub Type for TypeSupport
-    type_ = eprosima::fastdds::dds::TypeSupport(new HelloWorldPubSubType());
+    type_ = eprosima::fastdds::dds::TypeSupport(new HelloWorld_TypeIntrospectionExamplePubSubType());
 
     // Register type in participant
     participant_->register_type(type_);
@@ -265,19 +265,19 @@ void TypeIntrospectionPublisher::register_datapointxml_()
     }
 
     // Create Dynamic data
-    dyn_type_ = xmlparser::XMLProfileManager::getDynamicTypeByName("DataPointXml")->build();
+    dyn_type_ = xmlparser::XMLProfileManager::getDynamicTypeByName("DataPointXml_TypeIntrospection")->build();
     type_ = eprosima::fastdds::dds::TypeSupport(new types::DynamicPubSubType(dyn_type_));
 
     // Register type in participant
     type_.register_type(participant_);
 
-    std::cout << "Register DataPointXml Data Type, get from XML file data_point.xml" << std::endl;
+    std::cout << "Register DataPointXml_TypeIntrospection Data Type, get from XML file data_point.xml" << std::endl;
 }
 
 void TypeIntrospectionPublisher::publish_helloworld_(unsigned int msg_index)
 {
     // Create and initialize new data
-    HelloWorld new_data;
+    HelloWorld_TypeIntrospectionExample new_data;
     new_data.index(msg_index);
     memcpy(new_data.message().data(), "HelloWorld ", strlen("HelloWorld") + 1);
     new_data.message()[strlen("HelloWorld")] = 0; // Set last char as 0

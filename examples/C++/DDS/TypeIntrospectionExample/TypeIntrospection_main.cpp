@@ -64,7 +64,6 @@ int main(
 
     EntityType type = PUBLISHER;
     std::string topic_name = "TypeIntrospectionTopic";
-    std::string data_type_name = "HelloWorld";
     DataType data_type = DataType::HELLOWORLD;
     int count = 0;
     int domain = 0;

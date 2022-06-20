@@ -28,20 +28,20 @@
 using SerializedPayload_t = eprosima::fastrtps::rtps::SerializedPayload_t;
 using InstanceHandle_t = eprosima::fastrtps::rtps::InstanceHandle_t;
 
-HelloWorldPubSubType::HelloWorldPubSubType()
+HelloWorld_TypeIntrospectionExamplePubSubType::HelloWorld_TypeIntrospectionExamplePubSubType()
 {
-    setName("HelloWorld");
-    auto type_size = HelloWorld::getMaxCdrSerializedSize();
+    setName("HelloWorld_TypeIntrospectionExample");
+    auto type_size = HelloWorld_TypeIntrospectionExample::getMaxCdrSerializedSize();
     type_size += eprosima::fastcdr::Cdr::alignment(type_size, 4); /* possible submessage alignment */
     m_typeSize = static_cast<uint32_t>(type_size) + 4; /*encapsulation*/
-    m_isGetKeyDefined = HelloWorld::isKeyDefined();
-    size_t keyLength = HelloWorld::getKeyMaxCdrSerializedSize() > 16 ?
-            HelloWorld::getKeyMaxCdrSerializedSize() : 16;
+    m_isGetKeyDefined = HelloWorld_TypeIntrospectionExample::isKeyDefined();
+    size_t keyLength = HelloWorld_TypeIntrospectionExample::getKeyMaxCdrSerializedSize() > 16 ?
+            HelloWorld_TypeIntrospectionExample::getKeyMaxCdrSerializedSize() : 16;
     m_keyBuffer = reinterpret_cast<unsigned char*>(malloc(keyLength));
     memset(m_keyBuffer, 0, keyLength);
 }
 
-HelloWorldPubSubType::~HelloWorldPubSubType()
+HelloWorld_TypeIntrospectionExamplePubSubType::~HelloWorld_TypeIntrospectionExamplePubSubType()
 {
     if (m_keyBuffer != nullptr)
     {
@@ -49,11 +49,11 @@ HelloWorldPubSubType::~HelloWorldPubSubType()
     }
 }
 
-bool HelloWorldPubSubType::serialize(
+bool HelloWorld_TypeIntrospectionExamplePubSubType::serialize(
         void* data,
         SerializedPayload_t* payload)
 {
-    HelloWorld* p_type = static_cast<HelloWorld*>(data);
+    HelloWorld_TypeIntrospectionExample* p_type = static_cast<HelloWorld_TypeIntrospectionExample*>(data);
 
     // Object that manages the raw buffer.
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char*>(payload->data), payload->max_size);
@@ -78,12 +78,12 @@ bool HelloWorldPubSubType::serialize(
     return true;
 }
 
-bool HelloWorldPubSubType::deserialize(
+bool HelloWorld_TypeIntrospectionExamplePubSubType::deserialize(
         SerializedPayload_t* payload,
         void* data)
 {
     //Convert DATA to pointer of your type
-    HelloWorld* p_type = static_cast<HelloWorld*>(data);
+    HelloWorld_TypeIntrospectionExample* p_type = static_cast<HelloWorld_TypeIntrospectionExample*>(data);
 
     // Object that manages the raw buffer.
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char*>(payload->data), payload->length);
@@ -108,28 +108,28 @@ bool HelloWorldPubSubType::deserialize(
     return true;
 }
 
-std::function<uint32_t()> HelloWorldPubSubType::getSerializedSizeProvider(
+std::function<uint32_t()> HelloWorld_TypeIntrospectionExamplePubSubType::getSerializedSizeProvider(
         void* data)
 {
     return [data]() -> uint32_t
            {
-               return static_cast<uint32_t>(type::getCdrSerializedSize(*static_cast<HelloWorld*>(data))) +
+               return static_cast<uint32_t>(type::getCdrSerializedSize(*static_cast<HelloWorld_TypeIntrospectionExample*>(data))) +
                       4u /*encapsulation*/;
            };
 }
 
-void* HelloWorldPubSubType::createData()
+void* HelloWorld_TypeIntrospectionExamplePubSubType::createData()
 {
-    return reinterpret_cast<void*>(new HelloWorld());
+    return reinterpret_cast<void*>(new HelloWorld_TypeIntrospectionExample());
 }
 
-void HelloWorldPubSubType::deleteData(
+void HelloWorld_TypeIntrospectionExamplePubSubType::deleteData(
         void* data)
 {
-    delete(reinterpret_cast<HelloWorld*>(data));
+    delete(reinterpret_cast<HelloWorld_TypeIntrospectionExample*>(data));
 }
 
-bool HelloWorldPubSubType::getKey(
+bool HelloWorld_TypeIntrospectionExamplePubSubType::getKey(
         void* data,
         InstanceHandle_t* handle,
         bool force_md5)
@@ -139,16 +139,16 @@ bool HelloWorldPubSubType::getKey(
         return false;
     }
 
-    HelloWorld* p_type = static_cast<HelloWorld*>(data);
+    HelloWorld_TypeIntrospectionExample* p_type = static_cast<HelloWorld_TypeIntrospectionExample*>(data);
 
     // Object that manages the raw buffer.
     eprosima::fastcdr::FastBuffer fastbuffer(reinterpret_cast<char*>(m_keyBuffer),
-            HelloWorld::getKeyMaxCdrSerializedSize());
+            HelloWorld_TypeIntrospectionExample::getKeyMaxCdrSerializedSize());
 
     // Object that serializes the data.
     eprosima::fastcdr::Cdr ser(fastbuffer, eprosima::fastcdr::Cdr::BIG_ENDIANNESS);
     p_type->serializeKey(ser);
-    if (force_md5 || HelloWorld::getKeyMaxCdrSerializedSize() > 16)
+    if (force_md5 || HelloWorld_TypeIntrospectionExample::getKeyMaxCdrSerializedSize() > 16)
     {
         m_md5.init();
         m_md5.update(m_keyBuffer, static_cast<unsigned int>(ser.getSerializedDataLength()));

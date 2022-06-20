@@ -41,43 +41,43 @@ using namespace eprosima::fastrtps::rtps;
 void registerHelloWorldTypes()
 {
     TypeObjectFactory *factory = TypeObjectFactory::get_instance();
-    factory->add_type_object("HelloWorld", GetHelloWorldIdentifier(true),
-    GetHelloWorldObject(true));
-    factory->add_type_object("HelloWorld", GetHelloWorldIdentifier(false),
-    GetHelloWorldObject(false));
+    factory->add_type_object("HelloWorld_TypeIntrospectionExample", GetHelloWorld_TypeIntrospectionExampleIdentifier(true),
+    GetHelloWorld_TypeIntrospectionExampleObject(true));
+    factory->add_type_object("HelloWorld_TypeIntrospectionExample", GetHelloWorld_TypeIntrospectionExampleIdentifier(false),
+    GetHelloWorld_TypeIntrospectionExampleObject(false));
 
 }
 
-const TypeIdentifier* GetHelloWorldIdentifier(bool complete)
+const TypeIdentifier* GetHelloWorld_TypeIntrospectionExampleIdentifier(bool complete)
 {
-    const TypeIdentifier * c_identifier = TypeObjectFactory::get_instance()->get_type_identifier("HelloWorld", complete);
+    const TypeIdentifier * c_identifier = TypeObjectFactory::get_instance()->get_type_identifier("HelloWorld_TypeIntrospectionExample", complete);
     if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
         return c_identifier;
     }
 
-    GetHelloWorldObject(complete); // Generated inside
-    return TypeObjectFactory::get_instance()->get_type_identifier("HelloWorld", complete);
+    GetHelloWorld_TypeIntrospectionExampleObject(complete); // Generated inside
+    return TypeObjectFactory::get_instance()->get_type_identifier("HelloWorld_TypeIntrospectionExample", complete);
 }
 
-const TypeObject* GetHelloWorldObject(bool complete)
+const TypeObject* GetHelloWorld_TypeIntrospectionExampleObject(bool complete)
 {
-    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld", complete);
+    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld_TypeIntrospectionExample", complete);
     if (c_type_object != nullptr)
     {
         return c_type_object;
     }
     else if (complete)
     {
-        return GetCompleteHelloWorldObject();
+        return GetCompleteHelloWorld_TypeIntrospectionExampleObject();
     }
     //else
-    return GetMinimalHelloWorldObject();
+    return GetMinimalHelloWorld_TypeIntrospectionExampleObject();
 }
 
-const TypeObject* GetMinimalHelloWorldObject()
+const TypeObject* GetMinimalHelloWorld_TypeIntrospectionExampleObject()
 {
-    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld", false);
+    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld_TypeIntrospectionExample", false);
     if (c_type_object != nullptr)
     {
         return c_type_object;
@@ -166,14 +166,14 @@ const TypeObject* GetMinimalHelloWorldObject()
         identifier.equivalence_hash()[i] = objectHash.digest[i];
     }
 
-    TypeObjectFactory::get_instance()->add_type_object("HelloWorld", &identifier, type_object);
+    TypeObjectFactory::get_instance()->add_type_object("HelloWorld_TypeIntrospectionExample", &identifier, type_object);
     delete type_object;
-    return TypeObjectFactory::get_instance()->get_type_object("HelloWorld", false);
+    return TypeObjectFactory::get_instance()->get_type_object("HelloWorld_TypeIntrospectionExample", false);
 }
 
-const TypeObject* GetCompleteHelloWorldObject()
+const TypeObject* GetCompleteHelloWorld_TypeIntrospectionExampleObject()
 {
-    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld", true);
+    const TypeObject* c_type_object = TypeObjectFactory::get_instance()->get_type_object("HelloWorld_TypeIntrospectionExample", true);
     if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
     {
         return c_type_object;
@@ -230,7 +230,7 @@ const TypeObject* GetCompleteHelloWorldObject()
 
 
     // Header
-    type_object->complete().struct_type().header().detail().type_name("HelloWorld");
+    type_object->complete().struct_type().header().detail().type_name("HelloWorld_TypeIntrospectionExample");
     // TODO inheritance
 
 
@@ -256,7 +256,7 @@ const TypeObject* GetCompleteHelloWorldObject()
         identifier.equivalence_hash()[i] = objectHash.digest[i];
     }
 
-    TypeObjectFactory::get_instance()->add_type_object("HelloWorld", &identifier, type_object);
+    TypeObjectFactory::get_instance()->add_type_object("HelloWorld_TypeIntrospectionExample", &identifier, type_object);
     delete type_object;
-    return TypeObjectFactory::get_instance()->get_type_object("HelloWorld", true);
+    return TypeObjectFactory::get_instance()->get_type_object("HelloWorld_TypeIntrospectionExample", true);
 }

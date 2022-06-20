@@ -54,10 +54,10 @@ using namespace eprosima::fastrtps::types;
 
 eProsima_user_DllExport void registerHelloWorldTypes();
 
-eProsima_user_DllExport const TypeIdentifier* GetHelloWorldIdentifier(bool complete = false);
-eProsima_user_DllExport const TypeObject* GetHelloWorldObject(bool complete = false);
-eProsima_user_DllExport const TypeObject* GetMinimalHelloWorldObject();
-eProsima_user_DllExport const TypeObject* GetCompleteHelloWorldObject();
+eProsima_user_DllExport const TypeIdentifier* GetHelloWorld_TypeIntrospectionExampleIdentifier(bool complete = false);
+eProsima_user_DllExport const TypeObject* GetHelloWorld_TypeIntrospectionExampleObject(bool complete = false);
+eProsima_user_DllExport const TypeObject* GetMinimalHelloWorld_TypeIntrospectionExampleObject();
+eProsima_user_DllExport const TypeObject* GetCompleteHelloWorld_TypeIntrospectionExampleObject();
 
 
 #endif // _FAST_DDS_GENERATED_HELLOWORLD_TYPE_OBJECT_H_

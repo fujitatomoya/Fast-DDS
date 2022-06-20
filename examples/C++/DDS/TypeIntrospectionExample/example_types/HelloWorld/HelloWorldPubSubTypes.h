@@ -34,18 +34,18 @@
 #endif  // GEN_API_VER
 
 /*!
- * @brief This class represents the TopicDataType of the type HelloWorld defined by the user in the IDL file.
+ * @brief This class represents the TopicDataType of the type HelloWorld_TypeIntrospectionExample defined by the user in the IDL file.
  * @ingroup HELLOWORLD
  */
-class HelloWorldPubSubType : public eprosima::fastdds::dds::TopicDataType
+class HelloWorld_TypeIntrospectionExamplePubSubType : public eprosima::fastdds::dds::TopicDataType
 {
 public:
 
-    typedef HelloWorld type;
+    typedef HelloWorld_TypeIntrospectionExample type;
 
-    eProsima_user_DllExport HelloWorldPubSubType();
+    eProsima_user_DllExport HelloWorld_TypeIntrospectionExamplePubSubType();
 
-    eProsima_user_DllExport virtual ~HelloWorldPubSubType();
+    eProsima_user_DllExport virtual ~HelloWorld_TypeIntrospectionExamplePubSubType();
 
     eProsima_user_DllExport virtual bool serialize(
             void* data,
@@ -88,7 +88,7 @@ public:
     eProsima_user_DllExport inline bool construct_sample(
             void* memory) const override
     {
-        new (memory) HelloWorld();
+        new (memory) HelloWorld_TypeIntrospectionExample();
         return true;
     }
 

@@ -1,6 +1,6 @@
 <types>
     <type>
-        <struct name="DataPointXml">
+        <struct name="DataPointXml_TypeIntrospectionExample">
             <member name="index" type="int32"/>
             <member name="x" type="float64"/>
             <member name="y" type="float64"/>
