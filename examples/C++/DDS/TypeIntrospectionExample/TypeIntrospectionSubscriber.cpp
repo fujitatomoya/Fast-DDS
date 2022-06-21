@@ -1,4 +1,4 @@
-// Copyright 2021 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2022 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
 #include <fastrtps/types/TypesBase.h>
 
 #include "TypeIntrospectionSubscriber.h"
-#include "types.hpp"
+#include "types/types.hpp"
 
 using namespace eprosima::fastdds::dds;
 using namespace eprosima::fastdds::rtps;
@@ -51,31 +51,15 @@ std::atomic<bool> TypeIntrospectionSubscriber::stop_(false);
 std::mutex TypeIntrospectionSubscriber::terminate_cv_mtx_;
 std::condition_variable TypeIntrospectionSubscriber::terminate_cv_;
 
-TypeIntrospectionSubscriber::TypeIntrospectionSubscriber()
+TypeIntrospectionSubscriber::TypeIntrospectionSubscriber(
+        const std::string& topic_name,
+        uint32_t domain)
     : participant_(nullptr)
     , subscriber_(nullptr)
     , topic_(nullptr)
     , reader_(nullptr)
-{
-}
-
-bool TypeIntrospectionSubscriber::is_stopped()
-{
-    return stop_;
-}
-
-void TypeIntrospectionSubscriber::stop()
-{
-    stop_ = true;
-
-    type_discovered_cv_.notify_all();
-    terminate_cv_.notify_all();
-}
-
-bool TypeIntrospectionSubscriber::init(
-        const std::string& topic_name,
-        uint32_t max_messages,
-        uint32_t domain)
+    , topic_name_(topic_name)
+    , samples_(0)
 {
     DomainParticipantQos pqos;
     pqos.name("TypeIntrospectionExample_Participant_Subscriber");
@@ -101,7 +85,7 @@ bool TypeIntrospectionSubscriber::init(
 
     if (participant_ == nullptr)
     {
-        return false;
+        throw std::runtime_error("Error creating participant");
     }
 
     // CREATE THE SUBSCRIBER
@@ -109,13 +93,27 @@ bool TypeIntrospectionSubscriber::init(
 
     if (subscriber_ == nullptr)
     {
-        return false;
+        throw std::runtime_error("Error creating subscriber");
     }
 
-    max_messages_ = max_messages;
-    topic_name_ = topic_name;
+    std::cout <<
+        "Participant < " << participant_->guid() <<
+        " > created in domain < " << participant_->get_domain_id() <<
+        " > waiting to discover type in topic < " << topic_name <<
+        " > " << std::endl;
+}
 
-    return true;
+bool TypeIntrospectionSubscriber::is_stopped()
+{
+    return stop_;
+}
+
+void TypeIntrospectionSubscriber::stop()
+{
+    stop_ = true;
+
+    type_discovered_cv_.notify_all();
+    terminate_cv_.notify_all();
 }
 
 TypeIntrospectionSubscriber::~TypeIntrospectionSubscriber()
@@ -138,102 +136,15 @@ TypeIntrospectionSubscriber::~TypeIntrospectionSubscriber()
     }
 }
 
-void TypeIntrospectionSubscriber::on_type_information_received(
+void TypeIntrospectionSubscriber::on_participant_discovery(
         eprosima::fastdds::dds::DomainParticipant*,
-        const eprosima::fastrtps::string_255 topic_name,
-        const eprosima::fastrtps::string_255 type_name,
-        const eprosima::fastrtps::types::TypeInformation& type_information)
+        eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info)
 {
-    // only one type at a time could be registered
-    std::unique_lock<std::mutex> d_lck(type_discovered_cv_mtx_);
-
-    // First, if type has already been created, do not create a new one:
-    if (type_discovered_)
+    if (info.status == eprosima::fastrtps::rtps::ParticipantDiscoveryInfo::DISCOVERED_PARTICIPANT)
     {
-        return;
+        std::cout << "Participant found with guid: " << info.info.m_guid << std::endl;
     }
-
-    // If it is not the topic set, skip it
-    if (topic_name != topic_name_)
-    {
-        return;
-    }
-
-    // TOPIC FOUND
-    // Create DDS Entities associated
-    // Create registration callback to what happens when type has been registered
-    std::function<void(const std::string&, const eprosima::fastrtps::types::DynamicType_ptr)> callback(
-        [this]
-        (const std::string& name, const eprosima::fastrtps::types::DynamicType_ptr type)
-        {
-            // std::unique_lock<std::mutex> d_lck(type_discovered_cv_mtx_);
-            // NOTE: locking this mutex here creates a double block between on_type_information_received and this
-            // "asynchronous" callback
-
-            // Print type information
-            std::cout << "Type for topic " << topic_name_ << " found to be < " << name << " > registered." << std::endl;
-            std::cout << type << std::endl;
-
-            // Create topic
-            topic_ = participant_->create_topic(
-                    topic_name_,
-                    name,
-                    TOPIC_QOS_DEFAULT);
-
-            if (topic_ == nullptr)
-            {
-                return;
-            }
-
-            // Create DataReader
-            reader_ = subscriber_->create_datareader(
-                    topic_,
-                    DATAREADER_QOS_DEFAULT,
-                    this);
-
-            // Store dynamic type so can be used to read data
-            if (type == nullptr)
-            {
-                const types::TypeIdentifier* ident =
-                        types::TypeObjectFactory::get_instance()->get_type_identifier_trying_complete(name);
-
-                if (nullptr != ident)
-                {
-                    const types::TypeObject* obj =
-                            types::TypeObjectFactory::get_instance()->get_type_object(ident);
-
-                    this->dyn_type_ =
-                            types::TypeObjectFactory::get_instance()->build_dynamic_type(name, ident, obj);
-
-                    if (nullptr == dyn_type_)
-                    {
-                        std::cout << "ERROR: DynamicType cannot be created for type: " << name << std::endl;
-                    }
-                }
-                else
-                {
-                    std::cout << "ERROR: TypeIdentifier cannot be retrieved for type: " << name << std::endl;
-                }
-            }
-            else
-            {
-                this->dyn_type_ = type;
-            }
-
-            type_registered_.store(true);
-            type_discovered_cv_.notify_all();
-        });
-
-    // Register type
-    participant_->register_remote_type(
-        type_information,
-        type_name.to_string(),
-        callback);
-
-    type_name_ = type_name.to_string();
-
-    type_discovered_.store(true);
-    type_discovered_cv_.notify_all();
+    // TODO
 }
 
 void TypeIntrospectionSubscriber::on_subscription_matched(
@@ -242,18 +153,16 @@ void TypeIntrospectionSubscriber::on_subscription_matched(
 {
     if (info.current_count_change == 1)
     {
-        matched_ = info.current_count;
-        std::cout << "Subscriber matched." << std::endl;
+        std::cout << "Subscriber matched with Writer: " << info.last_publication_handle << std::endl;
     }
     else if (info.current_count_change == -1)
     {
-        matched_ = info.current_count;
-        std::cout << "Subscriber unmatched." << std::endl;
+        std::cout << "Subscriber unmatched with Writer: " << info.last_publication_handle << std::endl;
     }
     else
     {
         std::cout << info.current_count_change
-                  << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+                  << " is not a valid value for PublicationMatchedStatus current count change" << std::endl;
     }
 }
 
@@ -272,12 +181,7 @@ void TypeIntrospectionSubscriber::on_data_available(
         {
             samples_++;
 
-            std::cout << "Message number " << samples_ << " RECEIVED:\n";
-
-            // Print structure data
-            print_dynamic_data(new_data);
-
-            std::cout << std::endl;
+            std::cout << "Message number " << samples_ << " RECEIVED:\n" << new_data << std::endl;
 
             // Stop if max messages has already been read
             if (max_messages_ > 0 && (samples_ >= max_messages_))
@@ -289,57 +193,78 @@ void TypeIntrospectionSubscriber::on_data_available(
 }
 
 void TypeIntrospectionSubscriber::on_type_discovery(
-        eprosima::fastdds::dds::DomainParticipant* participant,
-        const eprosima::fastrtps::rtps::SampleIdentity& request_sample_id,
+        eprosima::fastdds::dds::DomainParticipant* ,
+        const eprosima::fastrtps::rtps::SampleIdentity& ,
         const eprosima::fastrtps::string_255& topic,
-        const eprosima::fastrtps::types::TypeIdentifier* identifier,
-        const eprosima::fastrtps::types::TypeObject* object,
+        const eprosima::fastrtps::types::TypeIdentifier* ,
+        const eprosima::fastrtps::types::TypeObject* ,
         eprosima::fastrtps::types::DynamicType_ptr dyn_type)
 {
     if (topic.to_string() != topic_name_)
     {
-        std::cout << "Discovered Topic " << topic.to_string() << " . Skipping." << std::endl;
+        std::cout << "Discovered Topic " << topic.to_string() << " . Not the one expecting, Skipping." << std::endl;
         return;
     }
-    else
-    {
-        std::cout << "Received type from topic " << topic.to_string() << " with type: " << dyn_type << std::endl;
-    }
 
-    // Print type information
-    std::cout << "Type for topic " << topic_name_ << " found to be < " << dyn_type->get_name() << " >." << std::endl;
-    std::cout << "Registering type: " << dyn_type << std::endl;
-
-    // Register type
-    TypeSupport m_type(new eprosima::fastrtps::types::DynamicPubSubType(dyn_type));
-    m_type.register_type(participant_);
-
-    // Create topic
-    topic_ = participant_->create_topic(
-            topic_name_,
-            dyn_type->get_name(),
-            TOPIC_QOS_DEFAULT);
-
-    if (topic_ == nullptr)
+    bool already_discovered = type_discovered_.exchange(true);
+    if (already_discovered)
     {
         return;
     }
 
-    // Create DataReader
-    reader_ = subscriber_->create_datareader(
-            topic_,
-            DATAREADER_QOS_DEFAULT,
-            this);
+    std::cout <<
+        "Discovered type from topic < " << topic.to_string() <<
+        " > with name < " << dyn_type->get_name() <<
+        " > by Topic discovery. Registering." << std::endl;
 
-    type_discovered_.store(true);
-    type_registered_.store(true);
-    type_discovered_cv_.notify_all();
+    // Registering type and creating reader
+    on_type_discovered_and_registered_(dyn_type);
+}
+
+void TypeIntrospectionSubscriber::on_type_information_received(
+        eprosima::fastdds::dds::DomainParticipant*,
+        const eprosima::fastrtps::string_255 topic_name,
+        const eprosima::fastrtps::string_255 type_name,
+        const eprosima::fastrtps::types::TypeInformation& type_information)
+{
+    if (topic_name.to_string() != topic_name_)
+    {
+        std::cout <<
+            "Discovered Type information from Topic < " << topic_name.to_string() <<
+            " > . Not the one expecting, Skipping." << std::endl;
+        return;
+    }
+
+    bool already_discovered = type_discovered_.exchange(true);
+    if (already_discovered)
+    {
+        return;
+    }
+
+    std::cout <<
+        "Found type in topic < " << topic_name_ <<
+        " > with name < " << type_name.to_string() <<
+        " > by LookUp. Registering." << std::endl;
+
+    std::function<void(const std::string&, const eprosima::fastrtps::types::DynamicType_ptr)> callback(
+        [this]
+        (const std::string& , const eprosima::fastrtps::types::DynamicType_ptr type)
+        {
+            this->on_type_discovered_and_registered_(type);
+        });
+
+    // Registering type and creating reader
+    participant_->register_remote_type(
+        type_information,
+        type_name.to_string(),
+        callback);
 }
 
 void TypeIntrospectionSubscriber::run(
         uint32_t samples)
 {
     stop_ = false;
+    max_messages_ = samples;
 
     signal(SIGINT, [](int signum)
             {
@@ -349,9 +274,8 @@ void TypeIntrospectionSubscriber::run(
             });
 
     // WAIT FOR TYPE DISCOVERY
-    std::cout << "Subscriber waiting to discover type for topic " << topic_name_
-        << " in domain " << participant_->get_domain_id()
-        << " . Please press CTRL+C to stop the Subscriber." << std::endl;
+    std::cout << "Subscriber waiting to discover type for topic < " << topic_name_
+        << " > . Please press CTRL+C to stop the Subscriber." << std::endl;
 
     // Wait for type discovered
     {
@@ -367,9 +291,11 @@ void TypeIntrospectionSubscriber::run(
         return;
     }
 
-    std::cout << "Subscriber " << reader_->guid() << " listening for data in topic " << topic_name_
-        << " with data type " << type_name_
-        << " in domain " << participant_->get_domain_id() << ". ";
+    std::cout <<
+        "Subscriber < " << reader_->guid() <<
+        " > listening for data in topic < " << topic_name_ <<
+        " > found data type < " << dyn_type_->get_name() <<
+        " >" << std::endl;
 
     // WAIT FOR SAMPLES READ
     if (samples > 0)
@@ -390,4 +316,45 @@ void TypeIntrospectionSubscriber::run(
                     return is_stopped();
                 });
     }
+}
+
+void TypeIntrospectionSubscriber::on_type_discovered_and_registered_(
+        const eprosima::fastrtps::types::DynamicType_ptr type)
+{
+    // Register type
+    TypeSupport m_type(new eprosima::fastrtps::types::DynamicPubSubType(type));
+    m_type.register_type(participant_);
+
+    // Create topic
+    topic_ = participant_->create_topic(
+            topic_name_,
+            type->get_name(),
+            TOPIC_QOS_DEFAULT);
+
+    if (topic_ == nullptr)
+    {
+        return;
+    }
+
+    // Create DataReader
+    reader_ = subscriber_->create_datareader(
+            topic_,
+            DATAREADER_QOS_DEFAULT,
+            this);
+
+    std::cout <<
+        "Participant < " << participant_->guid() <<
+        " > in domain < " << participant_->get_domain_id() <<
+        " > created reader < " << reader_->guid() <<
+        " > in topic < " << topic_name_ <<
+        " > with data type < " << type->get_name() <<
+        " > " << std::endl;
+
+    std::cout << "Data Type for this Subscriber is: " << type << std::endl;
+
+    dyn_type_ = type;
+
+    type_discovered_.store(true);
+    type_registered_.store(true);
+    type_discovered_cv_.notify_all();
 }

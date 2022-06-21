@@ -1,4 +1,4 @@
-// Copyright 2021 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2022 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,28 +25,71 @@
 #include <mutex>
 
 #include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/domain/DomainParticipantListener.hpp>
 #include <fastdds/dds/publisher/DataWriterListener.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 
-#include "types.hpp"
+#include "types/types.hpp"
 
 /**
  * Class used to group into a single working unit a Publisher with a DataWriter, its listener, and a TypeSupport member
  * corresponding to the HelloWorld datatype
  */
-class TypeIntrospectionPublisher
+class TypeIntrospectionPublisher : public eprosima::fastdds::dds::DomainParticipantListener
 {
 public:
 
-    TypeIntrospectionPublisher();
+    ///////////////////////////////////////////
+    // Constructors and destructors
+    ///////////////////////////////////////////
+
+    TypeIntrospectionPublisher(
+            const std::string& topic_name,
+            const uint32_t domain,
+            DataTypeKind data_type_kind,
+            GeneratorKind generator_kind);
 
     virtual ~TypeIntrospectionPublisher();
 
-    //! Initialize the publisher
-    bool init(
-            const std::string& topic_name,
-            DataType data_type,
-            uint32_t domain);
+
+    ///////////////////////////////////////////
+    // Interaction methods
+    ///////////////////////////////////////////
+
+    //! Run for number samples, publish every sleep seconds
+    void run(
+            uint32_t number,
+            uint32_t sleep);
+
+
+    ///////////////////////////////////////////
+    // Listener callback methods
+    ///////////////////////////////////////////
+
+    void on_participant_discovery(
+            eprosima::fastdds::dds::DomainParticipant* participant,
+            eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override;
+
+    void on_publication_matched(
+            eprosima::fastdds::dds::DataWriter* writer,
+            const eprosima::fastdds::dds::PublicationMatchedStatus& info) override;
+
+
+    ///////////////////////////////////////////
+    // Static methods
+    ///////////////////////////////////////////
+
+    //! Return the current state of execution
+    static bool is_stopped();
+
+    //! Trigger the end of execution
+    static void stop();
+
+protected:
+
+    ///////////////////////////////////////////
+    // Auxiliar internal methods
+    ///////////////////////////////////////////
 
     /**
      * @brief Publish a sample
@@ -56,29 +99,23 @@ public:
      */
     void publish(unsigned int msg_index);
 
-
-    //! Run for number samples, publish every sleep seconds
-    void run(
+    //! Run thread for number samples, publish every sleep seconds
+    void runThread(
             uint32_t number,
             uint32_t sleep);
 
-    //! Return the current state of execution
-    static bool is_stopped();
 
-    //! Trigger the end of execution
-    static void stop();
+    ///////////////////////////////////////////
+    // Data Type
+    ///////////////////////////////////////////
 
-private:
+    // Data Type manager object
+    std::unique_ptr<IDataType> data_type_;
 
-    // Write data depending on data type
-    void publish_helloworld_(unsigned int msg_index);
-    void publish_datapointxml_(unsigned int msg_index);
 
-    // Register type depending on data type
-    void register_helloworld_();
-    void register_datapointxml_();
-
-    DataType data_type_;
+    ///////////////////////////////////////////
+    // Fast DDS entities
+    ///////////////////////////////////////////
 
     eprosima::fastdds::dds::DomainParticipant* participant_;
 
@@ -88,42 +125,13 @@ private:
 
     eprosima::fastdds::dds::DataWriter* writer_;
 
-    eprosima::fastdds::dds::TypeSupport type_;
 
-    /**
-     * Class handling discovery events and dataflow
-     */
-    class PubListener : public eprosima::fastdds::dds::DataWriterListener
-    {
-    public:
-
-        PubListener()
-        {
-        }
-
-        ~PubListener() override
-        {
-        }
-
-        //! Callback executed when a DataReader is matched or unmatched
-        void on_publication_matched(
-                eprosima::fastdds::dds::DataWriter* writer,
-                const eprosima::fastdds::dds::PublicationMatchedStatus& info) override;
-    }
-    listener_;
-
-    //! Run thread for number samples, publish every sleep seconds
-    void runThread(
-            uint32_t number,
-            uint32_t sleep);
+    ///////////////////////////////////////////
+    // Static variables
+    ///////////////////////////////////////////
 
     //! Member used for control flow purposes
     static std::atomic<bool> stop_;
-
-    // ONLY FOR DATAPOINTXML
-    eprosima::fastrtps::types::DynamicType_ptr dyn_type_;
 };
-
-
 
 #endif /* _EPROSIMA_FASTDDS_EXAMPLES_CPP_DDS_TYPEINTROSPECTIONEXAMPLE_TYPEINTROSPECTIONPUBLISHER_H_ */

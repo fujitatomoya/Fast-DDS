@@ -1,4 +1,4 @@
-// Copyright 2021 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2022 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,20 +17,12 @@
  *
  */
 
-#define FASTDDS_ENFORCE_LOG_INFO
-#ifdef HAVE_LOG_NO_INFO
-#undef HAVE_LOG_NO_INFO
-#endif // HAVE_LOG_NO_INFO
-#define HAVE_LOG_NO_INFO 0
-
 #include <string>
-
-#include <fastdds/dds/log/Log.hpp>
 
 #include "arg_configuration.h"
 #include "TypeIntrospectionPublisher.h"
 #include "TypeIntrospectionSubscriber.h"
-#include "types.hpp"
+#include "types/types.hpp"
 
 enum EntityType
 {
@@ -64,7 +56,8 @@ int main(
 
     EntityType type = PUBLISHER;
     std::string topic_name = "TypeIntrospectionTopic";
-    DataType data_type = DataType::HELLOWORLD;
+    DataTypeKind data_type = DataTypeKind::HELLO_WORLD;
+    GeneratorKind generator_kind = GeneratorKind::GEN;
     int count = 0;
     int domain = 0;
 
@@ -127,14 +120,35 @@ int main(
                     break;
 
                 case optionIndex::DATA_TYPE:
-                    if (strcmp(opt.arg, HELLO_WORLD_DATA_TYPE) == 0)
+                    if (strcmp(opt.arg, HELLO_WORLD_DATA_TYPE_ARG) == 0)
                     {
-                        data_type = DataType::HELLOWORLD;
+                        data_type = DataTypeKind::HELLO_WORLD;
                     }
-                    else if (strcmp(opt.arg, DATA_POINT_XML_DATA_TYPE) == 0)
+                    else if (strcmp(opt.arg, ARRAY_DATA_TYPE_ARG) == 0)
                     {
-                        data_type = DataType::DATA_POINT_XML;
+                        data_type = DataTypeKind::ARRAY;
                     }
+                    else if (strcmp(opt.arg, STRUCT_DATA_TYPE_ARG) == 0)
+                    {
+                        data_type = DataTypeKind::STRUCT;
+                    }
+
+                    break;
+
+                case optionIndex::DATA_TYPE_GENERATOR:
+                    if (strcmp(opt.arg, GENERATOR_DATA_TYPE_GEN_ARG) == 0)
+                    {
+                        generator_kind = GeneratorKind::GEN;
+                    }
+                    else if (strcmp(opt.arg, GENERATOR_DATA_TYPE_CODE_ARG) == 0)
+                    {
+                        generator_kind = GeneratorKind::CODE;
+                    }
+                    else if (strcmp(opt.arg, GENERATOR_DATA_TYPE_XML_ARG) == 0)
+                    {
+                        generator_kind = GeneratorKind::XML;
+                    }
+
                     break;
 
                 case optionIndex::DOMAIN_ID:
@@ -160,26 +174,42 @@ int main(
         return 1;
     }
 
-    switch (type)
+    try
     {
-        case PUBLISHER:
+        switch (type)
         {
-            TypeIntrospectionPublisher mypub;
-            if (mypub.init(topic_name, data_type, static_cast<uint32_t>(domain)))
+            case PUBLISHER:
             {
+                // Create Publisher
+                TypeIntrospectionPublisher mypub(
+                    topic_name,
+                    static_cast<uint32_t>(domain),
+                    data_type,
+                    generator_kind);
+
+                // Run Participant
                 mypub.run(static_cast<uint32_t>(count), static_cast<uint32_t>(sleep));
+                break;
             }
-            break;
-        }
-        case SUBSCRIBER:
-        {
-            TypeIntrospectionSubscriber mysub;
-            if (mysub.init(topic_name, static_cast<uint32_t>(count), static_cast<uint32_t>(domain)))
+
+            case SUBSCRIBER:
             {
+                // Create Subscriber
+                TypeIntrospectionSubscriber mysub(
+                    topic_name,
+                    static_cast<uint32_t>(domain));
+
+                // Run Participant
                 mysub.run(static_cast<uint32_t>(count));
+
+                break;
             }
-            break;
         }
     }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Execution failed with error:\n " << e.what() << std::endl;
+    }
+
     return 0;
 }

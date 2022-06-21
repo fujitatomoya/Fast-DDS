@@ -1,4 +1,4 @@
-// Copyright 2021 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2022 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
 #include <fastdds/dds/domain/DomainParticipantListener.hpp>
 #include <fastdds/dds/subscriber/DataReaderListener.hpp>
 
-#include "types.hpp"
+#include "types/types.hpp"
 
 /**
  * Class used to group into a single working unit a Subscriber with a DataReader, its listener, and a TypeSupport member
@@ -39,15 +39,11 @@ class TypeIntrospectionSubscriber : public eprosima::fastdds::dds::DomainPartici
 {
 public:
 
-    TypeIntrospectionSubscriber();
+    TypeIntrospectionSubscriber(
+            const std::string& topic_name,
+            uint32_t domain);
 
     virtual ~TypeIntrospectionSubscriber();
-
-    //! Initialize the subscriber
-    bool init(
-            const std::string& topic_name,
-            uint32_t max_messages,
-            uint32_t domain);
 
     //! RUN the subscriber until number samples are received
     void run(
@@ -68,19 +64,9 @@ public:
             eprosima::fastdds::dds::DataReader* reader,
             const eprosima::fastdds::dds::SubscriptionMatchedStatus& info) override;
 
-    void on_type_information_received(
-            eprosima::fastdds::dds::DomainParticipant* participant,
-            const eprosima::fastrtps::string_255 topic_name,
-            const eprosima::fastrtps::string_255 type_name,
-            const eprosima::fastrtps::types::TypeInformation& type_information) override;
-
     void on_participant_discovery(
             eprosima::fastdds::dds::DomainParticipant* participant,
-            eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override
-    {
-        (void)participant, (void)info;
-        std::cout << "on_participant_discovery" << std::endl;
-    }
+            eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override;
 
     void on_type_discovery(
             eprosima::fastdds::dds::DomainParticipant* participant,
@@ -90,7 +76,16 @@ public:
             const eprosima::fastrtps::types::TypeObject* object,
             eprosima::fastrtps::types::DynamicType_ptr dyn_type) override;
 
-private:
+    virtual void on_type_information_received(
+            eprosima::fastdds::dds::DomainParticipant* participant,
+            const eprosima::fastrtps::string_255 topic_name,
+            const eprosima::fastrtps::string_255 type_name,
+            const eprosima::fastrtps::types::TypeInformation& type_information) override;
+
+protected:
+
+    void on_type_discovered_and_registered_(
+            const eprosima::fastrtps::types::DynamicType_ptr type);
 
     eprosima::fastdds::dds::DomainParticipant* participant_;
 
