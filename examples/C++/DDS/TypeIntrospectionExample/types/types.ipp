@@ -48,14 +48,6 @@ std::string DataType<Data, Gen>::name() const
 }
 
 template <DataTypeKind Data, GeneratorKind Gen>
-eprosima::fastrtps::types::ReturnCode_t DataType<Data, Gen>::register_in_participant(
-        eprosima::fastdds::dds::DomainParticipant* participant) const
-{
-    eprosima::fastdds::dds::TypeSupport type_(new eprosima::fastrtps::types::DynamicPubSubType(dyn_type_));
-    return participant->register_type(type_);
-}
-
-template <DataTypeKind Data, GeneratorKind Gen>
 eprosima::fastrtps::types::DynamicData_ptr DataType<Data, Gen>::get_data(
         const unsigned int& index) const
 {
@@ -67,13 +59,5 @@ eprosima::fastrtps::types::DynamicType_ptr DataType<Data, Gen>::get_type() const
 {
     return dyn_type_;
 }
-
-
-// template <>
-// eprosima::fastrtps::types::DynamicType_ptr internal_type<TK_ARRAY>(
-//     const eprosima::fastrtps::types::DynamicType_ptr& type)
-// {
-//     return type->
-// }
 
 #endif /* _EPROSIMA_FASTDDS_EXAMPLES_CPP_DDS_TYPEINTROSPECTIONEXAMPLE_TYPES_TYPES_IPP_ */

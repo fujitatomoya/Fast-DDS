@@ -54,9 +54,6 @@ public:
 
     virtual std::string name() const = 0;
 
-    virtual eprosima::fastrtps::types::ReturnCode_t register_in_participant(
-            eprosima::fastdds::dds::DomainParticipant* participant) const = 0;
-
     virtual eprosima::fastrtps::types::DynamicData_ptr get_data(
             const unsigned int& index) const = 0;
 
@@ -71,9 +68,6 @@ public:
     DataType();
 
     virtual std::string name() const override;
-
-    virtual eprosima::fastrtps::types::ReturnCode_t register_in_participant(
-            eprosima::fastdds::dds::DomainParticipant* participant) const override;
 
     virtual eprosima::fastrtps::types::DynamicData_ptr get_data(
             const unsigned int& index) const override;

@@ -78,8 +78,16 @@ TypeIntrospectionPublisher::TypeIntrospectionPublisher(
     }
 
     // REGISTER THE TYPE
-    data_type_->register_in_participant(participant_);
+    // Get type from data_type_ manager
+    types::DynamicType_ptr dyn_type = data_type_->get_type();
+    eprosima::fastdds::dds::TypeSupport type(new eprosima::fastrtps::types::DynamicPubSubType(dyn_type));
 
+    // Set type so introspection info is sent
+    type->auto_fill_type_information(true);
+    type->auto_fill_type_object(true);
+
+    // Register Participant
+    participant_->register_type(type);
 
     // CREATE THE PUBLISHER
     publisher_ = participant_->create_publisher(PUBLISHER_QOS_DEFAULT, this);
