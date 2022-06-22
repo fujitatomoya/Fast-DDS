@@ -33,6 +33,7 @@ enum class DataTypeKind
     HELLO_WORLD,
     ARRAY,
     STRUCT,
+    COMPLEX,
 };
 
 enum class GeneratorKind
@@ -45,6 +46,7 @@ enum class GeneratorKind
 constexpr const char * HELLO_WORLD_DATA_TYPE_NAME = "HelloWorld_TypeIntrospectionExample";
 constexpr const char * ARRAY_DATA_TYPE_NAME = "Array_TypeIntrospectionExample";
 constexpr const char * STRUCT_DATA_TYPE_NAME = "Struct_TypeIntrospectionExample";
+constexpr const char * COMPLEX_DATA_TYPE_NAME = "Complex_TypeIntrospectionExample";
 
 class IDataType
 {

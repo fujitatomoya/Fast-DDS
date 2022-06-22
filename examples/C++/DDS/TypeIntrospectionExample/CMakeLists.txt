@@ -45,23 +45,21 @@ message(STATUS "Configuring TypeIntrospection example...")
 
 file(GLOB IMPLEMENTATION_SOURCES_CPP "*.cpp")
 file(GLOB DATATYPEBASE_SOURCES_CPP "types/*.cpp")
-file(GLOB DATATYPE_HELLOWORLD_SOURCES_CPP "types/hello_world/**/*.cpp")
-file(GLOB DATATYPE_HELLOWORLD_SOURCES_CXX "types/hello_world/**/*.cxx")
-file(GLOB DATATYPE_ARRAY_SOURCES_CPP "types/array/**/*.cpp")
-file(GLOB DATATYPE_ARRAY_SOURCES_CXX "types/array/**/*.cxx")
-file(GLOB DATATYPE_STRUCT_SOURCES_CPP "types/struct/**/*.cpp")
-file(GLOB DATATYPE_STRUCT_SOURCES_CXX "types/struct/**/*.cxx")
+# file(GLOB DATATYPE_HELLOWORLD_SOURCES_CPP "types/hello_world/**/*.cpp")
+# file(GLOB DATATYPE_HELLOWORLD_SOURCES_CXX "types/hello_world/**/*.cxx")
+# file(GLOB DATATYPE_ARRAY_SOURCES_CPP "types/array/**/*.cpp")
+# file(GLOB DATATYPE_ARRAY_SOURCES_CXX "types/array/**/*.cxx")
+# file(GLOB DATATYPE_STRUCT_SOURCES_CPP "types/struct/**/*.cpp")
+# file(GLOB DATATYPE_STRUCT_SOURCES_CXX "types/struct/**/*.cxx")
+file(GLOB DATATYPE_SOURCES_CPP "types/**/**/*.cpp")
+file(GLOB DATATYPE_SOURCES_CXX "types/**/**/*.cxx")
 
 set(
     EXAMPLE_SOURCES
         ${IMPLEMENTATION_SOURCES_CPP}
         ${DATATYPEBASE_SOURCES_CPP}
-        ${DATATYPE_HELLOWORLD_SOURCES_CPP}
-        ${DATATYPE_HELLOWORLD_SOURCES_CXX}
-        ${DATATYPE_ARRAY_SOURCES_CPP}
-        ${DATATYPE_ARRAY_SOURCES_CXX}
-        ${DATATYPE_STRUCT_SOURCES_CPP}
-        ${DATATYPE_STRUCT_SOURCES_CXX}
+        ${DATATYPE_SOURCES_CPP}
+        ${DATATYPE_SOURCES_CXX}
     )
 
 # Create executable

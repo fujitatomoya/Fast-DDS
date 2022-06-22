@@ -78,6 +78,21 @@ std::unique_ptr<IDataType> data_type_factory(
             return std::unique_ptr<IDataType>(new DataType<DataTypeKind::STRUCT, GeneratorKind::XML>());
         }
     }
+    else if (data_kind == DataTypeKind::COMPLEX)
+    {
+        if (gen_kind == GeneratorKind::GEN)
+        {
+            return std::unique_ptr<IDataType>(new DataType<DataTypeKind::COMPLEX, GeneratorKind::GEN>());
+        }
+        else if (gen_kind == GeneratorKind::CODE)
+        {
+            return std::unique_ptr<IDataType>(new DataType<DataTypeKind::COMPLEX, GeneratorKind::CODE>());
+        }
+        else if (gen_kind == GeneratorKind::XML)
+        {
+            return std::unique_ptr<IDataType>(new DataType<DataTypeKind::COMPLEX, GeneratorKind::XML>());
+        }
+    }
 
     throw std::invalid_argument("Invalid data type kind");
 }

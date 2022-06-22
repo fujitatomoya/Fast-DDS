@@ -30,6 +30,7 @@ namespace option = eprosima::option;
 constexpr const char* HELLO_WORLD_DATA_TYPE_ARG = "hw";
 constexpr const char* ARRAY_DATA_TYPE_ARG = "array";
 constexpr const char* STRUCT_DATA_TYPE_ARG = "struct";
+constexpr const char* COMPLEX_DATA_TYPE_ARG = "complex";
 
 constexpr const char* GENERATOR_DATA_TYPE_GEN_ARG = "gen";
 constexpr const char* GENERATOR_DATA_TYPE_CODE_ARG = "code";
@@ -118,11 +119,12 @@ struct Arg : public option::Arg
             std::string data_type = std::string(option.arg);
             if (data_type != HELLO_WORLD_DATA_TYPE_ARG &&
                 data_type != ARRAY_DATA_TYPE_ARG &&
-                data_type != STRUCT_DATA_TYPE_ARG)
+                data_type != STRUCT_DATA_TYPE_ARG &&
+                data_type != COMPLEX_DATA_TYPE_ARG)
             {
                 if (msg)
                 {
-                    print_error("Option '", option, "' only accepts <hw|array|struct> values\n");
+                    print_error("Option '", option, "' only accepts <hw|array|struct|complex> values\n");
                 }
                 return option::ARG_ILLEGAL;
             }
@@ -184,9 +186,11 @@ const option::Descriptor usage[] = {
       "  -t <topic_name> \t--topic=<topic_name>  \tTopic name (Default: TypeIntrospectionTopic)." },
     { DATA_TYPE, 0, "x", "type",                  Arg::DataType,
       "  -x <data_type_name> \t--type=<data_type_name>  \tTopic Data Type name (Default: hw). "
-      "hw     -> HelloWorld data type (one string and one integer). "
-      "array  -> Data type with an array (one uint and an array of size 3 integer). "
-      "struct -> Complex data type with an internal struct (3 integers). "
+      "hw      -> HelloWorld data type (one string and one integer). "
+      "array   -> Data type with an array (one uint and an array of size 3 integer). "
+      "struct  -> Complex data type with an internal struct (3 integers). "
+      "complex -> Complex data type with 1 index, 1 substructure with 3 integers and an array of size 3 substructures, "
+      "with a string and a char each. "
     },
     { DATA_TYPE_GENERATOR, 0, "g", "generator",                  Arg::Generator,
       "  -g <generator_name> \t--generator=<generator_name>  \tData Type Generator (Default: gen). "

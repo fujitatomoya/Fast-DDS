@@ -42,6 +42,9 @@ std::string DataType<Data, Gen>::name() const
         case DataTypeKind::STRUCT:
             return STRUCT_DATA_TYPE_NAME;
 
+        case DataTypeKind::COMPLEX:
+            return COMPLEX_DATA_TYPE_NAME;
+
         default:
             throw std::runtime_error("Unsupported data type");
     }

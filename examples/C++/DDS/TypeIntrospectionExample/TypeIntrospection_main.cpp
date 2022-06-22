@@ -132,6 +132,10 @@ int main(
                     {
                         data_type = DataTypeKind::STRUCT;
                     }
+                    else if (strcmp(opt.arg, COMPLEX_DATA_TYPE_ARG) == 0)
+                    {
+                        data_type = DataTypeKind::COMPLEX;
+                    }
 
                     break;
 
