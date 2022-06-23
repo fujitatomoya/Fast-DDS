@@ -173,6 +173,8 @@ enum optionIndex
     DATA_TYPE,
     DATA_TYPE_GENERATOR,
     SAMPLES,
+    TYPE_OBJECT,
+    TYPE_INFORMATION,
 };
 
 const option::Descriptor usage[] = {
@@ -202,6 +204,10 @@ const option::Descriptor usage[] = {
       "  -d <id> \t--domain=<id>  \tDDS domain ID (Default: 0)." },
     { SAMPLES, 0, "s", "samples",              Arg::Numeric,
       "  -s <num> \t--samples=<num>  \tNumber of samples to send (Default: 0 => infinite samples)." },
+    { TYPE_OBJECT, 0, "o", "type-object",              Arg::None,
+      "  -o \t--type-object=  \tUse Type Object to send Data Type Introspection info." },
+    { TYPE_INFORMATION, 0, "i", "type-information",              Arg::None,
+      "  -i \t--type-information=  \tUse Type Information to send Data Type Introspection info." },
 
     { UNKNOWN_OPT, 0, "", "",                Arg::None,      "\nSubscriber options:"},
 
@@ -211,6 +217,10 @@ const option::Descriptor usage[] = {
       "  -d <id> \t--domain=<id>  \tDDS domain ID (Default: 0)." },
     { SAMPLES, 0, "s", "samples",              Arg::Numeric,
       "  -s <num> \t--samples=<num>  \tNumber of samples to wait for (Default: 0 => infinite samples)." },
+    { TYPE_OBJECT, 0, "o", "type-object",              Arg::None,
+      "  -o \t--type-object=  \tUse Type Object to send Data Type Introspection info." },
+    { TYPE_INFORMATION, 0, "i", "type-information",              Arg::None,
+      "  -i \t--type-information=  \tUse Type Information to send Data Type Introspection info." },
 
     { 0, 0, 0, 0, 0, 0 }
 };

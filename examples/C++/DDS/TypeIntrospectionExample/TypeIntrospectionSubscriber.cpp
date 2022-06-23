@@ -53,13 +53,17 @@ std::condition_variable TypeIntrospectionSubscriber::terminate_cv_;
 
 TypeIntrospectionSubscriber::TypeIntrospectionSubscriber(
         const std::string& topic_name,
-        uint32_t domain)
+        uint32_t domain,
+        bool use_type_object,
+        bool use_type_information)
     : participant_(nullptr)
     , subscriber_(nullptr)
     , topic_(nullptr)
     , reader_(nullptr)
     , topic_name_(topic_name)
     , samples_(0)
+    , use_type_object_(use_type_object)
+    , use_type_information_(use_type_information)
 {
     DomainParticipantQos pqos;
     pqos.name("TypeIntrospectionExample_Participant_Subscriber");
@@ -69,9 +73,13 @@ TypeIntrospectionSubscriber::TypeIntrospectionSubscriber(
     pqos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
     pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
     pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
-    pqos.wire_protocol().builtin.typelookup_config.use_client = true;
     pqos.wire_protocol().builtin.use_WriterLivelinessProtocol = false;
     pqos.wire_protocol().builtin.discovery_config.leaseDuration = c_TimeInfinite;
+
+    if (use_type_information_)
+    {
+        pqos.wire_protocol().builtin.typelookup_config.use_client = true;
+    }
 
     // Create listener mask so the data do not go to on_data_on_readers from subscriber
     StatusMask mask;
@@ -100,6 +108,9 @@ TypeIntrospectionSubscriber::TypeIntrospectionSubscriber(
         "Participant < " << participant_->guid() <<
         " > created in domain < " << participant_->get_domain_id() <<
         " > waiting to discover type in topic < " << topic_name <<
+        " > using to receive data type : " <<
+        (use_type_information ? "< type information > " : "") <<
+        (use_type_object ? "< type object > " : "") <<
         " > " << std::endl;
 }
 
@@ -200,25 +211,35 @@ void TypeIntrospectionSubscriber::on_type_discovery(
         const eprosima::fastrtps::types::TypeObject* ,
         eprosima::fastrtps::types::DynamicType_ptr dyn_type)
 {
-    if (topic.to_string() != topic_name_)
+    if (use_type_object_)
     {
-        std::cout << "Discovered Topic " << topic.to_string() << " . Not the one expecting, Skipping." << std::endl;
-        return;
+        if (!dyn_type)
+        {
+            // This is a Fast bug... ups
+            std::cout << "on_type_discovery return a nullptr type" << std::endl;
+            return;
+        }
+
+        if (topic.to_string() != topic_name_)
+        {
+            std::cout << "Discovered Topic " << topic.to_string() << " . Not the one expecting, Skipping." << std::endl;
+            return;
+        }
+
+        bool already_discovered = type_discovered_.exchange(true);
+        if (already_discovered)
+        {
+            return;
+        }
+
+        std::cout <<
+            "Discovered type from topic < " << topic.to_string() <<
+            " > with name < " << dyn_type->get_name() <<
+            " > by Topic discovery. Registering." << std::endl;
+
+        // Registering type and creating reader
+        on_type_discovered_and_registered_(dyn_type);
     }
-
-    bool already_discovered = type_discovered_.exchange(true);
-    if (already_discovered)
-    {
-        return;
-    }
-
-    std::cout <<
-        "Discovered type from topic < " << topic.to_string() <<
-        " > with name < " << dyn_type->get_name() <<
-        " > by Topic discovery. Registering." << std::endl;
-
-    // Registering type and creating reader
-    on_type_discovered_and_registered_(dyn_type);
 }
 
 void TypeIntrospectionSubscriber::on_type_information_received(
@@ -227,37 +248,40 @@ void TypeIntrospectionSubscriber::on_type_information_received(
         const eprosima::fastrtps::string_255 type_name,
         const eprosima::fastrtps::types::TypeInformation& type_information)
 {
-    if (topic_name.to_string() != topic_name_)
+    if (use_type_information_)
     {
-        std::cout <<
-            "Discovered Type information from Topic < " << topic_name.to_string() <<
-            " > . Not the one expecting, Skipping." << std::endl;
-        return;
-    }
-
-    bool already_discovered = type_discovered_.exchange(true);
-    if (already_discovered)
-    {
-        return;
-    }
-
-    std::cout <<
-        "Found type in topic < " << topic_name_ <<
-        " > with name < " << type_name.to_string() <<
-        " > by LookUp. Registering." << std::endl;
-
-    std::function<void(const std::string&, const eprosima::fastrtps::types::DynamicType_ptr)> callback(
-        [this]
-        (const std::string& , const eprosima::fastrtps::types::DynamicType_ptr type)
+        if (topic_name.to_string() != topic_name_)
         {
-            this->on_type_discovered_and_registered_(type);
-        });
+            std::cout <<
+                "Discovered Type information from Topic < " << topic_name.to_string() <<
+                " > . Not the one expecting, Skipping." << std::endl;
+            return;
+        }
 
-    // Registering type and creating reader
-    participant_->register_remote_type(
-        type_information,
-        type_name.to_string(),
-        callback);
+        bool already_discovered = type_discovered_.exchange(true);
+        if (already_discovered)
+        {
+            return;
+        }
+
+        std::cout <<
+            "Found type in topic < " << topic_name_ <<
+            " > with name < " << type_name.to_string() <<
+            " > by LookUp. Registering." << std::endl;
+
+        std::function<void(const std::string&, const eprosima::fastrtps::types::DynamicType_ptr)> callback(
+            [this]
+            (const std::string& , const eprosima::fastrtps::types::DynamicType_ptr type)
+            {
+                this->on_type_discovered_and_registered_(type);
+            });
+
+        // Registering type and creating reader
+        participant_->register_remote_type(
+            type_information,
+            type_name.to_string(),
+            callback);
+    }
 }
 
 void TypeIntrospectionSubscriber::run(

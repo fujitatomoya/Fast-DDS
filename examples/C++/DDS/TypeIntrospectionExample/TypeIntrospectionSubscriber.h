@@ -41,7 +41,9 @@ public:
 
     TypeIntrospectionSubscriber(
             const std::string& topic_name,
-            uint32_t domain);
+            uint32_t domain,
+            bool use_type_object,
+            bool use_type_information);
 
     virtual ~TypeIntrospectionSubscriber();
 
@@ -131,6 +133,9 @@ protected:
 
     // Dynamic data information
     eprosima::fastrtps::types::DynamicType_ptr dyn_type_;
+
+    bool use_type_object_;
+    bool use_type_information_;
 };
 
 #endif /* _EPROSIMA_FASTDDS_EXAMPLES_CPP_DDS_TYPEINTROSPECTIONEXAMPLE_TYPEINTROSPECTIONSUBSCRIBER_H_ */

@@ -47,7 +47,9 @@ public:
             const std::string& topic_name,
             const uint32_t domain,
             DataTypeKind data_type_kind,
-            GeneratorKind generator_kind);
+            GeneratorKind generator_kind,
+            bool use_type_object,
+            bool use_type_information);
 
     virtual ~TypeIntrospectionPublisher();
 
