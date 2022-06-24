@@ -111,7 +111,7 @@ TypeIntrospectionSubscriber::TypeIntrospectionSubscriber(
         " > using to receive data type : " <<
         (use_type_information ? "< type information > " : "") <<
         (use_type_object ? "< type object > " : "") <<
-        " > " << std::endl;
+        std::endl;
 }
 
 bool TypeIntrospectionSubscriber::is_stopped()

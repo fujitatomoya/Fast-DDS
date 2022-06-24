@@ -140,7 +140,7 @@ TypeIntrospectionPublisher::TypeIntrospectionPublisher(
         " > using to send data type : " <<
         (use_type_information ? "< type information > " : "") <<
         (use_type_object ? "< type object > " : "") <<
-        " > " << std::endl;
+        std::endl;
 
     std::cout << "Data Type for this Publisher is: " << data_type_->get_type() << std::endl;
 }

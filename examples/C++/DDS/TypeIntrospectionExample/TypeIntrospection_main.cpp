@@ -134,9 +134,18 @@ int main(
                     {
                         data_type = DataTypeKind::STRUCT;
                     }
+                    else if (strcmp(opt.arg, PLAIN_DATA_TYPE_ARG) == 0)
+                    {
+                        data_type = DataTypeKind::PLAIN;
+                    }
                     else if (strcmp(opt.arg, COMPLEX_DATA_TYPE_ARG) == 0)
                     {
                         data_type = DataTypeKind::COMPLEX;
+                    }
+                    else
+                    {
+                        std::cerr << "ERROR: incorrect Data Type." << std::endl;
+                        return 1;
                     }
 
                     break;
